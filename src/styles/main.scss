@@ -3,9 +3,11 @@
 
 @import-normalize;
 
+@import './variables';
+
 body {
     margin: 0;
-    font-family: 'Raleway', Avenir, sans-serif;
+    font-family: $font-family;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
@@ -17,11 +19,22 @@ body {
 }
 
 .c-app {
+    position: relative;
     display: flex;
     flex-direction: column;
     height: 100vh;
 }
 
+.c-app__loader {
+    position: absolute;
+    z-index: 2;
+    top: 70px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
 .c-app__main {
-    height: calc(100% - 68px);
+    z-index: 0;
+    height: calc(100% - 70px);
 }

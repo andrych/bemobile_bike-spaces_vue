@@ -1,25 +1,20 @@
 <template>
   <div class="c-app" id="app">
     <Header />
-    <Loader v-if="isLoading" class="c-app__main" />
-    <Map
-      v-else
-      class="c-app__main"
-      :layer="mapLayer"
-      :source="mapSource"
-      @load="onMapLoaded"
-    />
+    <div v-if="isLoading" class="c-app__loader">
+      <Loader message="Loading map data..." />
+    </div>
+    <Map class="c-app__main" :markers="markers" @load="onMapLoaded" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { Header, Loader, Map } from "./components";
+import { Header, Loader, Map, MapMarker } from "./components";
 import {
   getRealTimeBikeParking,
   RealTimeBikeParkingResponse
 } from "./services/realTimeBikeParking";
-import { GeoJsonSource } from "./types";
 
 export default Vue.extend({
   name: "App",
@@ -32,56 +27,52 @@ export default Vue.extend({
     return {
       mapLoaded: false,
       isFetching: true,
+      isSyncing: false,
       data: [] as RealTimeBikeParkingResponse["records"]
     };
   },
   async created() {
-    await getRealTimeBikeParking()
-      .then(response => {
-        // do stuff
-        if (response.records && response.records.length) {
-          this.data = response.records;
-        }
-      })
-      .finally(() => {
-        // Artificial delay to show loader
-        setTimeout(() => {
-          this.isFetching = false;
-        }, 2000);
-      });
+    let initialFetch = false;
+
+    const getData = async () => {
+      if (initialFetch) {
+        this.isSyncing = true;
+      }
+      await getRealTimeBikeParking()
+        .then(response => {
+          // do stuff
+          if (response.records && response.records.length) {
+            this.data = response.records;
+            initialFetch = true;
+          }
+        })
+        .finally(() => {
+          // Artificial delay to show loader
+          this.isSyncing = false;
+          setTimeout(() => {
+            this.isFetching = false;
+          }, 3000);
+        });
+    };
+
+    await getData();
+
+    if (initialFetch) {
+      setInterval(() => getData(), 60 * 1000);
+    }
   },
   computed: {
     isLoading(): boolean {
-      return this.isFetching && !this.mapLoaded;
+      return !this.mapLoaded || this.isFetching;
     },
-    mapLayer() {
-      return {
-        id: "real-time-bike-parking-layer",
-        type: "circle",
-        source: "real-time-bike-parking",
-        paint: {
-          "circle-radius": 10,
-          "circle-color": "#223b53",
-          "circle-stroke-color": "white",
-          "circle-stroke-width": 1,
-          "circle-opacity": 0.5
-        }
-      };
-    },
-    mapSource(): GeoJsonSource {
-      const features = this.data.map(item => ({
-        type: "Feature",
-        geometry: item.geometry,
-        properties: {}
+    markers(): MapMarker[] {
+      return this.data.map(item => ({
+        id: item.recordid,
+        coordinates: item.geometry.coordinates,
+        title: item.fields.facilityname,
+        totalPlaces: item.fields.totalplaces,
+        freePlaces: item.fields.freeplaces
       }));
-
-      return {
-        type: "geojson",
-        data: {
-          type: "FeatureCollection",
-          features
-        }
-      };
     }
   },
   methods: {
