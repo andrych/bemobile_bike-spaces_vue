@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,200;0,400;1,200;1,400&display=swap');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons+Outlined');
+
+@import-normalize;
+
+body {
+    margin: 0;
+    font-family: 'Raleway', Avenir, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+.c-app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.c-app__main {
+    height: calc(100% - 68px);
+}
