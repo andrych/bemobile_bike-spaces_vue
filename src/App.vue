@@ -1,7 +1,9 @@
 <template>
   <div class="c-app" id="app">
     <Header />
+    <Loader v-if="isLoading" class="c-app__main" />
     <Map
+      v-else
       class="c-app__main"
       :layer="mapLayer"
       :source="mapSource"
@@ -12,7 +14,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Header, Map } from "./components";
+import { Header, Loader, Map } from "./components";
 import {
   getRealTimeBikeParking,
   RealTimeBikeParkingResponse
@@ -23,6 +25,7 @@ export default Vue.extend({
   name: "App",
   components: {
     Header,
+    Loader,
     Map
   },
   data() {
