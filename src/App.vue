@@ -1,6 +1,6 @@
 <template>
   <div class="c-app" id="app">
-    <Header />
+    <Header :isSyncing="isSyncing" />
     <div v-if="isLoading" class="c-app__loader">
       <Loader message="Loading map data..." />
     </div>
