@@ -14,6 +14,7 @@ export interface MapLoadedEvent {
 }
 
 export interface MarkerClickEvent {
+  map: Map;
   marker: {
     _lngLat: { lng: number; lat: number };
   };

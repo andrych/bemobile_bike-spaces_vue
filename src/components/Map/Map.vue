@@ -32,40 +32,36 @@
 </template>
 
 <script lang="ts">
-import { Map } from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import Vue, { PropType } from "vue";
 import { MglMap, MglMarker, MglPopup } from "vue-mapbox";
 import { MAP_CONFIG } from "./Map.const";
 import { MapLoadedEvent, MapMarker, MarkerClickEvent } from "./Map.types";
 
-export default {
+export default Vue.extend({
   components: { MglMap, MglMarker, MglPopup },
   props: {
     markers: {
-      type: Array as () => MapMarker[]
+      type: Array as PropType<MapMarker[]>
     }
   },
   data() {
     return {
-      mapConfig: MAP_CONFIG,
-      map: null as Map | null
+      mapConfig: MAP_CONFIG
     };
   },
   methods: {
     onLoaded(e: MapLoadedEvent): void {
-      this.map = e.map;
       this.$emit("load", e);
     },
     onMarkerClick(e: MarkerClickEvent): void {
-      this.$nextTick(() => {
+      this.$nextTick((): void => {
         const { lng, lat } = e.marker._lngLat;
-        if (this.map) {
-          this.map.flyTo({ center: [lng, lat], zoom: 15 });
-        }
+        e.map.flyTo({ center: [lng, lat], zoom: 15 });
       });
     }
   }
-};
+});
 </script>
 
 <style scoped lang="scss">
